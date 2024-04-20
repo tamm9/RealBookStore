@@ -56,7 +56,7 @@ public class BookRepository {
                 bookList.add(createBookFromResultSet(rs));
             }
         }catch (SQLException e) {
-            LOG.error("Error occurred while searching for books with search term: {}", searchTerm, e);
+            LOG.warn("Warning: Error occurred while searching for books with search term: {}", searchTerm, e);
         }
         return bookList;
     }
@@ -100,7 +100,7 @@ public class BookRepository {
                         LOG.error("Error occurred while inserting genre for book with id: {}", finalId, e);
                     }
                 });
-                auditLogger.audit("New book created with id: " + finalId);
+                LOG.info("New book created with id: {}", finalId);
             }
         } catch (SQLException e) {
             LOG.error("Error occurred while creating new book", e);

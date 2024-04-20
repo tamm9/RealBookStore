@@ -50,7 +50,7 @@ public class PersonRepository {
                 personList.add(createPersonFromResultSet(rs));
             }
         }catch (Exception e){
-            LOG.error("Error occurred while searching for persons with search term: {}", searchTerm, e);
+            LOG.warn("Warning: Error occurred while searching for persons with search term: {}", searchTerm, e);
         }
         return personList;
     }
@@ -106,8 +106,8 @@ public class PersonRepository {
             if(!personUpdate.getFirstName().equals(personFromDb.getFirstName()) || !personUpdate.getEmail().equals(personFromDb.getEmail())) {
                 auditLogger.auditChange(new Entity("UpdatedPerson",
                         String.valueOf(personFromDb.getId()),
-                        personFromDb.toString(),
-                        personUpdate.toString()));
+                        String.valueOf(personFromDb),
+                        String.valueOf(personUpdate)));
             }
 
         } catch (SQLException e) {

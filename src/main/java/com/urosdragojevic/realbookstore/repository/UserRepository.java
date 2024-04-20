@@ -60,6 +60,7 @@ public class UserRepository {
         ) {
             statement.executeUpdate(query);
             auditLogger.audit("Deleted user with id: " + userId);
+            LOG.info("User deleted with id: {}", userId);
         } catch (SQLException e) {
             LOG.error("Error occurred while deleting user with id: {}", userId, e);
         }
