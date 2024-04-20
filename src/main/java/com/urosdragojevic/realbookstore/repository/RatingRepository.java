@@ -1,5 +1,7 @@
 package com.urosdragojevic.realbookstore.repository;
 
+import com.urosdragojevic.realbookstore.audit.AuditLogger;
+import com.urosdragojevic.realbookstore.audit.Entity;
 import com.urosdragojevic.realbookstore.domain.Rating;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import java.util.List;
 public class RatingRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(RatingRepository.class);
+    private static final AuditLogger auditLogger = AuditLogger.getAuditLogger(RatingRepository.class);
     private DataSource dataSource;
 
     public RatingRepository(DataSource dataSource) {
@@ -35,6 +38,8 @@ public class RatingRepository {
                     preparedStatement.setInt(2, rating.getBookId());
                     preparedStatement.setInt(3, rating.getUserId());
                     preparedStatement.executeUpdate();
+
+                    auditLogger.audit("Rating for book: " + rating.getBookId() + "successfully updated by user: " + rating.getUserId());
                 }
             } else {
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query3)) {
@@ -42,10 +47,13 @@ public class RatingRepository {
                     preparedStatement.setInt(2, rating.getUserId());
                     preparedStatement.setInt(3, rating.getRating());
                     preparedStatement.executeUpdate();
+
+                    auditLogger.audit("Rating for book: " + rating.getBookId() + "successfully added by user: " + rating.getUserId());
+
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while creating or updating rating for book: {}, user: {}", rating.getBookId(), rating.getUserId(), e);
         }
     }
 
@@ -59,7 +67,7 @@ public class RatingRepository {
                 ratingList.add(new Rating(rs.getInt(1), rs.getInt(2), rs.getInt(3)));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while retrieving ratings for book: {}", bookId, e);
         }
         return ratingList;
     }

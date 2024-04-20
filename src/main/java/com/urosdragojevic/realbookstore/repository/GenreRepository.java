@@ -35,7 +35,7 @@ public class GenreRepository {
                 genreList.add(new Genre(rs.getInt(1), rs.getString(2)));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while retrieving all genres", e);
         }
         return genreList;
     }
@@ -50,7 +50,7 @@ public class GenreRepository {
                 genreList.add(new Genre(rs.getInt(1), rs.getString(2)));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while retrieving genres for book: {}", bookId, e);
         }
         return genreList;
     }

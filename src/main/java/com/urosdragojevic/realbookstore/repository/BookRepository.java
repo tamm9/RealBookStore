@@ -1,6 +1,7 @@
 package com.urosdragojevic.realbookstore.repository;
 
 import com.urosdragojevic.realbookstore.audit.AuditLogger;
+import com.urosdragojevic.realbookstore.audit.Entity;
 import com.urosdragojevic.realbookstore.domain.Book;
 import com.urosdragojevic.realbookstore.domain.Genre;
 import com.urosdragojevic.realbookstore.domain.NewBook;
@@ -36,7 +37,7 @@ public class BookRepository {
                 bookList.add(book);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while retrieving all books", e);
         }
         return bookList;
     }
@@ -54,6 +55,8 @@ public class BookRepository {
             while (rs.next()) {
                 bookList.add(createBookFromResultSet(rs));
             }
+        }catch (SQLException e) {
+            LOG.error("Error occurred while searching for books with search term: {}", searchTerm, e);
         }
         return bookList;
     }
@@ -67,7 +70,7 @@ public class BookRepository {
                 return createBookFromResultSet(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while retrieving book with id: {}", bookId, e);
         }
         return null;
     }
@@ -94,12 +97,13 @@ public class BookRepository {
                         statement2.setInt(2, genre.getId());
                         statement2.executeUpdate();
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        LOG.error("Error occurred while inserting genre for book with id: {}", finalId, e);
                     }
                 });
+                auditLogger.audit("New book created with id: " + finalId);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while creating new book", e);
         }
         return id;
     }
@@ -116,8 +120,10 @@ public class BookRepository {
             statement.executeUpdate(query2);
             statement.executeUpdate(query3);
             statement.executeUpdate(query4);
+
+            auditLogger.audit("Book deleted with id: " + bookId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Error occurred while deleting book with id: {}", bookId, e);
         }
     }
 
