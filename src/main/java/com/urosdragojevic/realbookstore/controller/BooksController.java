@@ -3,6 +3,7 @@ package com.urosdragojevic.realbookstore.controller;
 import com.urosdragojevic.realbookstore.domain.*;
 import com.urosdragojevic.realbookstore.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -74,12 +75,14 @@ public class BooksController {
     }
 
     @GetMapping(value = "/books/search", produces = "application/json")
+    @PreAuthorize("hasAuthority('VIEW_BOOKS_LIST')")
     @ResponseBody
     public List<Book> search(@RequestParam("query") String query) throws SQLException {
         return bookRepository.search(query);
     }
 
     @PostMapping("/books")
+    @PreAuthorize("hasAuthority('CREATE_BOOK')")
     public String createBook(NewBook book) {
         List<Genre> genreList = this.genreRepository.getAll();
         List<Genre> genresToInsert = book.getGenres().stream().map(bookGenreId -> genreList.stream().filter(genre -> genre.getId() == bookGenreId).findFirst().get()).collect(Collectors.toList());
